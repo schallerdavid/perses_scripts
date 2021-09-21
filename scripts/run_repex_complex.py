@@ -2,7 +2,7 @@
 Run RepEx free energy calculations for a protein:ligand complex using Perses.
 
 Install dependencies:
-mamba create -n perses -c conda-forge perses
+mamba create -n perses -c conda-forge -c openeye perses openeye-toolkits
 
 Credits to @glass-w
 """
@@ -11,12 +11,12 @@ import logging
 from pathlib import Path
 import pickle
 
-import simtk.unit as unit
 from openmmtools import mcmc
 from openmmtools.multistate import MultiStateReporter
 from perses.annihilation.lambda_protocol import LambdaProtocol
 from perses.samplers.multistate import HybridRepexSampler
-
+import simtk.unit as unit
+import simtk.openmm as mm
 
 # Set up logger
 logging.basicConfig(level=logging.DEBUG)
@@ -51,6 +51,10 @@ if not args.output_dir:
 else:
     args.output_dir = Path(args.output_dir)
 args.output_dir.mkdir(parents=True, exist_ok=True)
+
+# setting maximum number of CPU threads to 1
+platform = mm.Platform.getPlatformByName("CPU")
+platform.setPropertyDefaultValue(property="Threads", value=str(1))
 
 # load hybrid topology factory
 htf = pickle.load(open(args.input_dir / f"{args.phase}.pickle", "rb"))

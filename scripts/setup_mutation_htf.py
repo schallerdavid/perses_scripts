@@ -3,7 +3,7 @@ Setup a hybrid topology factory for protein mutations with perses.
 Tested with perses 0.9.2.
 
 Install dependencies:
-mamba create -n perses -c conda-forge perses
+mamba create -n perses -c conda-forge -c openeye perses openeye-toolkits
 
 Credits to @glass-w
 """
@@ -18,6 +18,7 @@ numba_logger.setLevel(logging.WARNING)
 import mdtraj as md
 import numpy as np
 from perses.app.relative_point_mutation_setup import PointMutationExecutor
+import simtk.openmm as mm
 
 
 def render_protein_residue_atom_mapping(topology_proposal, path):
@@ -131,6 +132,10 @@ args = parser.parse_args()
 # make output directory
 args.output_dir = Path(args.output_dir)
 args.output_dir.mkdir(parents=True, exist_ok=True)
+
+# setting maximum number of CPU threads to 1
+platform = mm.Platform.getPlatformByName("CPU")
+platform.setPropertyDefaultValue(property="Threads", value=str(1))
 
 # make the system
 solvent_delivery = PointMutationExecutor(
