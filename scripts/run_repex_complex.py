@@ -50,6 +50,7 @@ if not args.output_dir:
     args.output_dir = args.input_dir
 else:
     args.output_dir = Path(args.output_dir)
+args.output_dir.mkdir(parents=True, exist_ok=True)
 
 # load hybrid topology factory
 htf = pickle.load(open(args.input_dir / f"{args.phase}.pickle", "rb"))
