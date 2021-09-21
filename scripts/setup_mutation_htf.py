@@ -3,7 +3,7 @@ Setup a hybrid topology factory for protein mutations with perses.
 Tested with perses 0.9.2.
 
 Install dependencies:
-mamba create -n perses -c conda-forge -c openeye perses openeye-toolkits
+mamba create -n perses -c conda-forge -c openeye mpi4py perses openeye-toolkits
 
 Credits to @glass-w
 """
