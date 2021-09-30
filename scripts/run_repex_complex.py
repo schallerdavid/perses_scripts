@@ -4,7 +4,7 @@ Run RepEx free energy calculations for a protein:ligand complex using Perses.
 Install dependencies:
 mamba create -n perses -c conda-forge -c openeye mpi4py perses openeye-toolkits
 
-Credits to @glass-w
+Credits to @glass-w and zhang-ivy
 """
 import argparse
 import logging
