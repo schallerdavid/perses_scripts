@@ -84,7 +84,6 @@ nsteps_eq = 375000  # 1.5 ns
 nsteps_neq = 375000  # 1.5 ns
 neq_splitting = "V R H O R V"
 timestep = 4.0 * unit.femtosecond
-platform_name = "CUDA"
 
 # load hybrid topology factory
 htf = pickle.load(open(args.input_dir / f"{args.phase}.pickle", "rb"))
@@ -101,11 +100,11 @@ integrator = PeriodicNonequilibriumIntegrator(
 )
 
 # Set up context
-platform = openmm.Platform.getPlatformByName(platform_name)
-if platform_name in ["CUDA", "OpenCL"]:
-    platform.setPropertyDefaultValue("Precision", "mixed")
-if platform_name in ["CUDA"]:
-    platform.setPropertyDefaultValue("DeterministicForces", "true")
+platform = openmm.Platform.getPlatformByName("CPU")
+platform.setPropertyDefaultValue(property="Threads", value=str(1))
+platform = openmm.Platform.getPlatformByName("CUDA")
+platform.setPropertyDefaultValue("Precision", "mixed")
+platform.setPropertyDefaultValue("DeterministicForces", "true")
 context = openmm.Context(system, integrator, platform)
 context.setPeriodicBoxVectors(*system.getDefaultPeriodicBoxVectors())
 context.setPositions(positions)
