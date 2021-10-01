@@ -120,14 +120,13 @@ reverse_eq_new, reverse_neq_old, reverse_neq_new = list(), list(), list()
 
 for cycle in range(args.cycles):
     # Equilibrium (lambda = 0)
+    initial_time = time.time()
     for step in range(nsteps_eq):
-        initial_time = time.time()
         integrator.step(1)
-        elapsed_time = (time.time() - initial_time) * unit.seconds
-        if step % 7500 == 0:
+        if step % 25000 == 0:
             logging.debug(
-                f"Cycle: {cycle}, Step: {step}, equilibrating at lambda = 0, "
-                f"took: {elapsed_time / unit.seconds} seconds"
+                f"Cycle: {cycle}, Step: {step}, Equilibrating at lambda = 0, "
+                f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
             )
             positions = context.getState(
                 getPositions=True, enforcePeriodicBox=False
@@ -138,14 +137,12 @@ for cycle in range(args.cycles):
     # Forward (0 -> 1)
     forward_works = [integrator.get_protocol_work(dimensionless=True)]
     for fwd_step in range(nsteps_neq):
-        initial_time = time.time()
         integrator.step(1)
-        elapsed_time = (time.time() - initial_time) * unit.seconds
         forward_works.append(integrator.get_protocol_work(dimensionless=True))
-        if fwd_step % 300 == 0:
+        if fwd_step % 25000 == 0:
             logging.info(
-                f"Cycle: {cycle}, forward NEQ step: {fwd_step}, "
-                f"took: {elapsed_time / unit.seconds} seconds"
+                f"Cycle: {cycle}, Step: {fwd_step}, Forward NEQ, "
+                f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
             )
             positions = context.getState(
                 getPositions=True, enforcePeriodicBox=False
@@ -158,13 +155,11 @@ for cycle in range(args.cycles):
 
     # Equilibrium (lambda = 1)
     for step in range(nsteps_eq):
-        initial_time = time.time()
         integrator.step(1)
-        elapsed_time = (time.time() - initial_time) * unit.seconds
-        if step % 7500 == 0:
+        if step % 25000 == 0:
             logging.info(
-                f"Cycle: {cycle}, Step: {step}, equilibrating at lambda = 1, "
-                f"took: {elapsed_time / unit.seconds} seconds"
+                f"Cycle: {cycle}, Step: {step}, Equilibrating at lambda = 1, "
+                f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
             )
             positions = context.getState(
                 getPositions=True, enforcePeriodicBox=False
@@ -175,14 +170,12 @@ for cycle in range(args.cycles):
     # Reverse work (1 -> 0)
     reverse_works = [integrator.get_protocol_work(dimensionless=True)]
     for rev_step in range(nsteps_neq):
-        initial_time = time.time()
         integrator.step(1)
-        elapsed_time = (time.time() - initial_time) * unit.seconds
         reverse_works.append(integrator.get_protocol_work(dimensionless=True))
-        if rev_step % 300 == 0:
+        if rev_step % 25000 == 0:
             logging.info(
-                f"Cycle: {cycle}, reverse NEQ step: {rev_step}, "
-                f"took: {elapsed_time / unit.seconds} seconds"
+                f"Cycle: {cycle}, Step: {rev_step}, Reverse NEQ, "
+                f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
             )
             positions = context.getState(
                 getPositions=True, enforcePeriodicBox=False
@@ -215,3 +208,5 @@ for cycle in range(args.cycles):
             np.save(f, reverse_neq_old)
         with open(args.output_dir / f"{args.phase}_reverse_neq_new_{cycle}.npy", "wb") as f:
             np.save(f, reverse_neq_new)
+
+    logging.info(f"Finished cycle {cycle} after {(time.time() - initial_time) / 3600} hours.")
