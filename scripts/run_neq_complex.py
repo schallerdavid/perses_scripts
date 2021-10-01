@@ -44,10 +44,10 @@ parser.add_argument(
 )
 parser.add_argument(
     "-c",
-    dest="cycles",
+    dest="cycle",
     type=int,
-    default=100,
-    help="number of cycles to run NEQ, default is 100"
+    default=0,
+    help="cycle ID to run NEQ, default is 0"
 )
 parser.add_argument(
     "-t",
@@ -118,95 +118,94 @@ forward_works_master, reverse_works_master = list(), list()
 forward_eq_old, forward_neq_old, forward_neq_new = list(), list(), list()
 reverse_eq_new, reverse_neq_old, reverse_neq_new = list(), list(), list()
 
-for cycle in range(args.cycles):
-    # Equilibrium (lambda = 0)
-    initial_time = time.time()
-    for step in range(nsteps_eq):
-        integrator.step(1)
-        if step % 25000 == 0:
-            logging.debug(
-                f"Cycle: {cycle}, Step: {step}, Equilibrating at lambda = 0, "
-                f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
-            )
-            positions = context.getState(
-                getPositions=True, enforcePeriodicBox=False
-            ).getPositions(asNumpy=True)
-            old_positions = np.asarray(htf.old_positions(positions))
-            forward_eq_old.append(old_positions)
+# Equilibrium (lambda = 0)
+initial_time = time.time()
+for step in range(nsteps_eq):
+    integrator.step(1)
+    if step % 25000 == 0:
+        logging.debug(
+            f"Step: {step}, Equilibrating at lambda = 0, "
+            f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
+        )
+        positions = context.getState(
+            getPositions=True, enforcePeriodicBox=False
+        ).getPositions(asNumpy=True)
+        old_positions = np.asarray(htf.old_positions(positions))
+        forward_eq_old.append(old_positions)
 
-    # Forward (0 -> 1)
-    forward_works = [integrator.get_protocol_work(dimensionless=True)]
-    for fwd_step in range(nsteps_neq):
-        integrator.step(1)
-        forward_works.append(integrator.get_protocol_work(dimensionless=True))
-        if fwd_step % 25000 == 0:
-            logging.info(
-                f"Cycle: {cycle}, Step: {fwd_step}, Forward NEQ, "
-                f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
-            )
-            positions = context.getState(
-                getPositions=True, enforcePeriodicBox=False
-            ).getPositions(asNumpy=True)
-            old_positions = np.asarray(htf.old_positions(positions))
-            new_positions = np.asarray(htf.new_positions(positions))
-            forward_neq_old.append(old_positions)
-            forward_neq_new.append(new_positions)
-    forward_works_master.append(forward_works)
+# Forward (0 -> 1)
+forward_works = [integrator.get_protocol_work(dimensionless=True)]
+for fwd_step in range(nsteps_neq):
+    integrator.step(1)
+    forward_works.append(integrator.get_protocol_work(dimensionless=True))
+    if fwd_step % 25000 == 0:
+        logging.info(
+            f"Step: {fwd_step}, Forward NEQ, "
+            f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
+        )
+        positions = context.getState(
+            getPositions=True, enforcePeriodicBox=False
+        ).getPositions(asNumpy=True)
+        old_positions = np.asarray(htf.old_positions(positions))
+        new_positions = np.asarray(htf.new_positions(positions))
+        forward_neq_old.append(old_positions)
+        forward_neq_new.append(new_positions)
+forward_works_master.append(forward_works)
 
-    # Equilibrium (lambda = 1)
-    for step in range(nsteps_eq):
-        integrator.step(1)
-        if step % 25000 == 0:
-            logging.info(
-                f"Cycle: {cycle}, Step: {step}, Equilibrating at lambda = 1, "
-                f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
-            )
-            positions = context.getState(
-                getPositions=True, enforcePeriodicBox=False
-            ).getPositions(asNumpy=True)
-            new_positions = np.asarray(htf.new_positions(positions))
-            reverse_eq_new.append(new_positions)
+# Equilibrium (lambda = 1)
+for step in range(nsteps_eq):
+    integrator.step(1)
+    if step % 25000 == 0:
+        logging.info(
+            f"Step: {step}, Equilibrating at lambda = 1, "
+            f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
+        )
+        positions = context.getState(
+            getPositions=True, enforcePeriodicBox=False
+        ).getPositions(asNumpy=True)
+        new_positions = np.asarray(htf.new_positions(positions))
+        reverse_eq_new.append(new_positions)
 
-    # Reverse work (1 -> 0)
-    reverse_works = [integrator.get_protocol_work(dimensionless=True)]
-    for rev_step in range(nsteps_neq):
-        integrator.step(1)
-        reverse_works.append(integrator.get_protocol_work(dimensionless=True))
-        if rev_step % 25000 == 0:
-            logging.info(
-                f"Cycle: {cycle}, Step: {rev_step}, Reverse NEQ, "
-                f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
-            )
-            positions = context.getState(
-                getPositions=True, enforcePeriodicBox=False
-            ).getPositions(asNumpy=True)
-            old_positions = np.asarray(htf.old_positions(positions))
-            new_positions = np.asarray(htf.new_positions(positions))
-            reverse_neq_old.append(old_positions)
-            reverse_neq_new.append(new_positions)
-    reverse_works_master.append(reverse_works)
+# Reverse work (1 -> 0)
+reverse_works = [integrator.get_protocol_work(dimensionless=True)]
+for rev_step in range(nsteps_neq):
+    integrator.step(1)
+    reverse_works.append(integrator.get_protocol_work(dimensionless=True))
+    if rev_step % 25000 == 0:
+        logging.info(
+            f"Step: {rev_step}, Reverse NEQ, "
+            f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
+        )
+        positions = context.getState(
+            getPositions=True, enforcePeriodicBox=False
+        ).getPositions(asNumpy=True)
+        old_positions = np.asarray(htf.old_positions(positions))
+        new_positions = np.asarray(htf.new_positions(positions))
+        reverse_neq_old.append(old_positions)
+        reverse_neq_new.append(new_positions)
+reverse_works_master.append(reverse_works)
 
-    # Save works
-    with open(args.output_dir / f"{args.phase}_forward_{cycle}.npy", "wb") as f:
-        np.save(f, forward_works_master)
-    with open(args.output_dir / f"{args.phase}_reverse_{cycle}.npy", "wb") as f:
-        np.save(f, reverse_works_master)
+# Save works
+with open(args.output_dir / f"{args.phase}_forward_{args.cycle}.npy", "wb") as f:
+    np.save(f, forward_works_master)
+with open(args.output_dir / f"{args.phase}_reverse_{args.cycle}.npy", "wb") as f:
+    np.save(f, reverse_works_master)
 
-    # Save trajectories
-    if args.trajectories:
-        with open(args.output_dir / f"{args.phase}_forward_eq_old_{cycle}.npy", "wb") as f:
-            np.save(f, forward_eq_old)
-        with open(args.output_dir / f"{args.phase}_reverse_eq_new_{cycle}.npy", "wb") as f:
-            np.save(f, reverse_eq_new)
+# Save trajectories
+if args.trajectories:
+    with open(args.output_dir / f"{args.phase}_forward_eq_old_{args.cycle}.npy", "wb") as f:
+        np.save(f, forward_eq_old)
+    with open(args.output_dir / f"{args.phase}_reverse_eq_new_{args.cycle}.npy", "wb") as f:
+        np.save(f, reverse_eq_new)
 
-        with open(args.output_dir / f"{args.phase}_forward_neq_old_{cycle}.npy", "wb") as f:
-            np.save(f, forward_neq_old)
-        with open(args.output_dir / f"{args.phase}_forward_neq_new_{cycle}.npy", "wb") as f:
-            np.save(f, forward_neq_new)
+    with open(args.output_dir / f"{args.phase}_forward_neq_old_{args.cycle}.npy", "wb") as f:
+        np.save(f, forward_neq_old)
+    with open(args.output_dir / f"{args.phase}_forward_neq_new_{args.cycle}.npy", "wb") as f:
+        np.save(f, forward_neq_new)
 
-        with open(args.output_dir / f"{args.phase}_reverse_neq_old_{cycle}.npy", "wb") as f:
-            np.save(f, reverse_neq_old)
-        with open(args.output_dir / f"{args.phase}_reverse_neq_new_{cycle}.npy", "wb") as f:
-            np.save(f, reverse_neq_new)
+    with open(args.output_dir / f"{args.phase}_reverse_neq_old_{args.cycle}.npy", "wb") as f:
+        np.save(f, reverse_neq_old)
+    with open(args.output_dir / f"{args.phase}_reverse_neq_new_{args.cycle}.npy", "wb") as f:
+        np.save(f, reverse_neq_new)
 
-    logging.info(f"Finished cycle {cycle} after {(time.time() - initial_time) / 3600} hours.")
+logging.info(f"Finished cycle {args.cycle} after {(time.time() - initial_time) / 3600} hours.")
