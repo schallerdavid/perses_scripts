@@ -82,6 +82,7 @@ DEFAULT_ALCHEMICAL_FUNCTIONS = {
 temperature = 300  # 300 K
 nsteps_eq = 375000  # 1.5 ns
 nsteps_neq = 375000  # 1.5 ns
+nworks = 1000  # number of works to save, also used for saving snapshots
 neq_splitting = "V R H O R V"
 timestep = 4.0 * unit.femtosecond
 
@@ -122,11 +123,12 @@ reverse_eq_new, reverse_neq_old, reverse_neq_new = list(), list(), list()
 initial_time = time.time()
 for step in range(nsteps_eq):
     integrator.step(1)
-    if step % 25000 == 0:
+    if step % round(nsteps_eq / 20) == 0:
         logging.debug(
             f"Step: {step}, Equilibrating at lambda = 0, "
             f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
         )
+    if step % round(nsteps_eq / nworks) == 0:
         positions = context.getState(
             getPositions=True, enforcePeriodicBox=False
         ).getPositions(asNumpy=True)
@@ -138,11 +140,12 @@ forward_works = [integrator.get_protocol_work(dimensionless=True)]
 for fwd_step in range(nsteps_neq):
     integrator.step(1)
     forward_works.append(integrator.get_protocol_work(dimensionless=True))
-    if fwd_step % 25000 == 0:
+    if fwd_step % round(nsteps_neq / 20) == 0:
         logging.info(
             f"Step: {fwd_step}, Forward NEQ, "
             f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
         )
+    if fwd_step % round(nsteps_neq / nworks) == 0:
         positions = context.getState(
             getPositions=True, enforcePeriodicBox=False
         ).getPositions(asNumpy=True)
@@ -155,11 +158,12 @@ forward_works_master.append(forward_works)
 # Equilibrium (lambda = 1)
 for step in range(nsteps_eq):
     integrator.step(1)
-    if step % 25000 == 0:
+    if step % round(nsteps_eq / 20) == 0:
         logging.info(
             f"Step: {step}, Equilibrating at lambda = 1, "
             f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
         )
+    if step % round(nsteps_eq / nworks) == 0:
         positions = context.getState(
             getPositions=True, enforcePeriodicBox=False
         ).getPositions(asNumpy=True)
@@ -171,11 +175,12 @@ reverse_works = [integrator.get_protocol_work(dimensionless=True)]
 for rev_step in range(nsteps_neq):
     integrator.step(1)
     reverse_works.append(integrator.get_protocol_work(dimensionless=True))
-    if rev_step % 25000 == 0:
+    if rev_step % round(nsteps_neq / 20) == 0:
         logging.info(
             f"Step: {rev_step}, Reverse NEQ, "
             f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
         )
+    if rev_step % round(nsteps_neq / nworks) == 0:
         positions = context.getState(
             getPositions=True, enforcePeriodicBox=False
         ).getPositions(asNumpy=True)
