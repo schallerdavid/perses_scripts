@@ -52,7 +52,7 @@ parser.add_argument(
 parser.add_argument(
     "-t",
     dest="trajectories",
-    type=bool,
+    action="store_true",
     default=False,
     help="if trajectories shall be written, default is False"
 )

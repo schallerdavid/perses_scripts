@@ -95,35 +95,35 @@ parser.add_argument(
 parser.add_argument(
     "--conduct_endstate_validation",
     dest="conduct_endstate_validation",
-    type=bool,
+    action="store_true",
     default=False,
     help="if endstate validation should be conducted",
 )
 parser.add_argument(
     "--allow_undefined_stereo",
     dest="allow_undefined_stereo",
-    type=bool,
+    action="store_true",
     default=False,
     help="if undefined stereo centers should be allowed in the ligand",
 )
 parser.add_argument(
     "--flatten_torsions",
     dest="flatten_torsions",
-    type=bool,
+    action="store_false",
     default=True,
     help="if torsions should be flattened",
 )
 parser.add_argument(
     "--flatten_exceptions",
     dest="flatten_exceptions",
-    type=bool,
+    action="store_false",
     default=True,
     help="if exceptions should be flattened",
 )
 parser.add_argument(
     "--generate_rest_capable_htf",
     dest="generate_rest_capable_htf",
-    type=bool,
+    action="store_true",
     default=False,
     help="if hybrid topology factory should be capable of rest",
 )
