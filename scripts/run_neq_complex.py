@@ -139,7 +139,6 @@ for step in range(nsteps_eq):
 forward_works = [integrator.get_protocol_work(dimensionless=True)]
 for fwd_step in range(nsteps_neq):
     integrator.step(1)
-    forward_works.append(integrator.get_protocol_work(dimensionless=True))
     if fwd_step % round(nsteps_neq / 20) == 0:
         logging.info(
             f"Step: {fwd_step}, Forward NEQ, "
@@ -149,6 +148,7 @@ for fwd_step in range(nsteps_neq):
         positions = context.getState(
             getPositions=True, enforcePeriodicBox=False
         ).getPositions(asNumpy=True)
+        forward_works.append(integrator.get_protocol_work(dimensionless=True))
         old_positions = np.asarray(htf.old_positions(positions))
         new_positions = np.asarray(htf.new_positions(positions))
         forward_neq_old.append(old_positions)
@@ -174,7 +174,6 @@ for step in range(nsteps_eq):
 reverse_works = [integrator.get_protocol_work(dimensionless=True)]
 for rev_step in range(nsteps_neq):
     integrator.step(1)
-    reverse_works.append(integrator.get_protocol_work(dimensionless=True))
     if rev_step % round(nsteps_neq / 20) == 0:
         logging.info(
             f"Step: {rev_step}, Reverse NEQ, "
@@ -184,6 +183,7 @@ for rev_step in range(nsteps_neq):
         positions = context.getState(
             getPositions=True, enforcePeriodicBox=False
         ).getPositions(asNumpy=True)
+        reverse_works.append(integrator.get_protocol_work(dimensionless=True))
         old_positions = np.asarray(htf.old_positions(positions))
         new_positions = np.asarray(htf.new_positions(positions))
         reverse_neq_old.append(old_positions)
