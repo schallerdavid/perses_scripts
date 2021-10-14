@@ -82,7 +82,8 @@ DEFAULT_ALCHEMICAL_FUNCTIONS = {
 temperature = 300  # 300 K
 nsteps_eq = 375000  # 1.5 ns
 nsteps_neq = 375000  # 1.5 ns
-nworks = 1000  # number of works to save, also used for saving snapshots
+nworks = 1000  # number of works to save
+nsnapshots = 100  # number of snapshots to save
 neq_splitting = "V R H O R V"
 timestep = 4.0 * unit.femtosecond
 
@@ -128,7 +129,7 @@ for step in range(nsteps_eq):
             f"Step: {step}, Equilibrating at lambda = 0, "
             f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
         )
-    if step % round(nsteps_eq / nworks) == 0:
+    if step % round(nsteps_eq / nsnapshots) == 0:
         positions = context.getState(
             getPositions=True, enforcePeriodicBox=False
         ).getPositions(asNumpy=True)
@@ -145,10 +146,12 @@ for fwd_step in range(nsteps_neq):
             f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
         )
     if fwd_step % round(nsteps_neq / nworks) == 0:
+        forward_works.append(integrator.get_protocol_work(dimensionless=True))
+
+    if fwd_step % round(nsteps_neq / nsnapshots) == 0:
         positions = context.getState(
             getPositions=True, enforcePeriodicBox=False
         ).getPositions(asNumpy=True)
-        forward_works.append(integrator.get_protocol_work(dimensionless=True))
         old_positions = np.asarray(htf.old_positions(positions))
         new_positions = np.asarray(htf.new_positions(positions))
         forward_neq_old.append(old_positions)
@@ -163,7 +166,7 @@ for step in range(nsteps_eq):
             f"Step: {step}, Equilibrating at lambda = 1, "
             f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
         )
-    if step % round(nsteps_eq / nworks) == 0:
+    if step % round(nsteps_eq / nsnapshots) == 0:
         positions = context.getState(
             getPositions=True, enforcePeriodicBox=False
         ).getPositions(asNumpy=True)
@@ -179,11 +182,14 @@ for rev_step in range(nsteps_neq):
             f"Step: {rev_step}, Reverse NEQ, "
             f"Elapsed time: {(time.time() - initial_time) / 60} minutes"
         )
+
     if rev_step % round(nsteps_neq / nworks) == 0:
+        reverse_works.append(integrator.get_protocol_work(dimensionless=True))
+
+    if rev_step % round(nsteps_neq / nsnapshots) == 0:
         positions = context.getState(
             getPositions=True, enforcePeriodicBox=False
         ).getPositions(asNumpy=True)
-        reverse_works.append(integrator.get_protocol_work(dimensionless=True))
         old_positions = np.asarray(htf.old_positions(positions))
         new_positions = np.asarray(htf.new_positions(positions))
         reverse_neq_old.append(old_positions)
