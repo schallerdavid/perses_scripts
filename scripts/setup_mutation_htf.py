@@ -113,6 +113,7 @@ platform.setPropertyDefaultValue(property="Threads", value=str(1))
 solvent_delivery = PointMutationExecutor(
     protein_filename=args.protein_path,
     mutation_chain_id=args.protein_chain,
+    old_residue=args.mutation[:3],
     mutation_residue_id=args.mutation[3:-3],
     proposed_residue=args.mutation[-3:],
     conduct_endstate_validation=args.conduct_endstate_validation,
