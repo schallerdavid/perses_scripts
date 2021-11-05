@@ -70,7 +70,7 @@ parser.add_argument(
     dest="ligand_path",
     type=str,
     default="",
-    help="the path to the ligand structure in e.g. SDF format",
+    help="the path to e.g. the ligand structure in SDF format or another protein in PDB format",
 )
 parser.add_argument(
     "-m",
