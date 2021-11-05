@@ -143,7 +143,6 @@ solvent_delivery = PointMutationExecutor(
     mutation_chain_id=args.protein_chain,
     mutation_residue_id=args.mutation[3:-3],
     proposed_residue=args.mutation[-3:],
-    old_residue=args.mutation[:3],
     conduct_endstate_validation=args.conduct_endstate_validation,
     ligand_input=args.ligand_path if args.ligand_path else None,
     allow_undefined_stereo_sdf=args.allow_undefined_stereo,
