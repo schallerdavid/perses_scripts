@@ -48,7 +48,7 @@ parser.add_argument(
     "-m",
     dest="mutation",
     type=str,
-    help="the mutation to setup in the format ALA123THR",
+    help="the mutation to setup in the format ALA123THR including non-standard amino acids e.g. HIP159ALA",
 )
 parser.add_argument(
     "-c",
