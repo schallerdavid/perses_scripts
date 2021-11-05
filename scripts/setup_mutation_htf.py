@@ -18,36 +18,8 @@ numba_logger.setLevel(logging.WARNING)
 import mdtraj as md
 import numpy as np
 from perses.app.relative_point_mutation_setup import PointMutationExecutor
+from perses.utils.smallmolecules import render_protein_residue_atom_mapping
 import simtk.openmm as mm
-
-
-def render_protein_residue_atom_mapping(topology_proposal, path):
-    """
-    Save a picture of the protein mutation atom mapping.
-
-    Parameters
-    ----------
-    topology_proposal: perses.rjmc.topology_proposal.TopologyProposal object
-        TopologyProposal object rendered by the ProposalEngine
-
-    path: str
-        Path for writing the protein mutation atom mapping.
-    """
-    from perses.utils.smallmolecules import render_atom_mapping
-
-    oe_res_maps = {}
-    for omm_new_idx, omm_old_idx in topology_proposal._new_to_old_atom_map.items():
-        if omm_new_idx in topology_proposal._new_topology.residue_to_oemol_map.keys():
-            oe_res_maps[topology_proposal._new_topology.residue_to_oemol_map[omm_new_idx]] = \
-                topology_proposal._old_topology.residue_to_oemol_map[omm_old_idx]
-
-    render_atom_mapping(
-        path,
-        topology_proposal._old_topology.residue_oemol,
-        topology_proposal._new_topology.residue_oemol,
-        oe_res_maps
-    )
-    return
 
 
 parser = argparse.ArgumentParser(
